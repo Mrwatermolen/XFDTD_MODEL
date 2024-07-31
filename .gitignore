@@ -1,0 +1,5 @@
+.vscode
+tmp
+.cache
+build
+.venv
