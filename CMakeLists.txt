@@ -32,7 +32,14 @@ target_include_directories(xfdtd_model INTERFACE
 add_subdirectory(test)
 
 set(XFDTD_MODEL_CMAKE_DIR ${CMAKE_CURRENT_BINARY_DIR}/cmake)
-install(TARGETS xfdtd_model EXPORT xfdtd_model-targets)
+set(XFDTD_MODEL_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+
+install(
+  EXPORT xfdtd_model-targets
+  FILE xfdtd_model-targets.cmake
+  NAMESPACE xfdtd::
+  DESTINATION ${XFDTD_MODEL_INSTALL_PREFIX}/lib/cmake/xfdtd_model
+)
 
 include(CMakePackageConfigHelpers)
 
@@ -45,4 +52,18 @@ configure_package_config_file(
 export(EXPORT xfdtd_model-targets
   FILE ${XFDTD_MODEL_CMAKE_DIR}/xfdtd_model-targets.cmake
   NAMESPACE xfdtd::
+)
+
+install(
+  FILES ${XFDTD_MODEL_CMAKE_DIR}/xfdtd_model-config.cmake
+  DESTINATION ${XFDTD_MODEL_INSTALL_PREFIX}/lib/cmake/xfdtd_model
+)
+
+install(TARGETS xfdtd_model
+  EXPORT xfdtd_model-targets
+  INCLUDES DESTINATION include
+)
+
+install(DIRECTORY ${XFDTD_MODEL_PUBLIC_INCLUDE_DIRS}
+  DESTINATION ${XFDTD_MODEL_INSTALL_PREFIX}
 )
