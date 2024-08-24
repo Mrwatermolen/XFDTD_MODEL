@@ -1,0 +1,3 @@
+@PACKAGE_INIT@
+
+include ( "${CMAKE_CURRENT_LIST_DIR}/xfdtd_model-targets.cmake" )

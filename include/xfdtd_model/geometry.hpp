@@ -1,145 +1,15 @@
 #ifndef __XFDTD_MODEL_SUPPORT_GEOMETRY_HPP__
 #define __XFDTD_MODEL_SUPPORT_GEOMETRY_HPP__
 
-#include <cmath>
+#include <xfdtd/coordinate_system/coordinate_system.h>
+
 #include <iomanip>
 #include <ios>
 #include <iostream>
 #include <ostream>
 #include <sstream>
 
-// template <typename T>
-// concept Arithmetic = std::is_arithmetic_v<T>;
-
-// template <Arithmetic T>
-// class Vector {
-//  public:
-//   inline static const T ZERO_TOLERANCE = 1e-6;
-
-//  public:
-//   Vector() = default;
-
-//   Vector(T x, T y, T z);
-
-//   Vector(const Vector<T> &v) = default;
-
-//   Vector(Vector<T> &&v) noexcept = default;
-
-//   auto operator=(const Vector<T> &v) -> Vector<T> & = default;
-
-//   auto operator=(Vector<T> &&v) noexcept -> Vector<T> & = default;
-
-//   ~Vector() = default;
-
-//   auto operator==(const Vector<T> &v) const -> bool;
-
-//   auto operator+(const Vector<T> &v) const -> Vector<T>;
-
-//   auto operator-(const Vector<T> &v) const -> Vector<T>;
-
-//   auto operator*(T s) const -> Vector<T>;
-
-//   auto operator/(T s) const -> Vector<T>;
-
-//   auto x() const -> T;
-
-//   auto y() const -> T;
-
-//   auto z() const -> T;
-
-//   auto normL2() const -> T;
-
-//   auto dot(const Vector<T> &v) const -> T;
-
-//   auto cross(const Vector<T> &v) const -> Vector<T>;
-
-//   auto orthogonal(const Vector<T> &v) const -> bool;
-
-//   auto parallel(const Vector<T> &v) const -> bool;
-
-//  private:
-//   T _x{}, _y{}, _z{};
-// };
-
-// template <Arithmetic T>
-// inline auto operator<<(std::ostream &os, const Vector<T> &v) -> std::ostream
-// & {
-//   os << "(" << v.x() << ", " << v.y() << ", " << v.z() << ")";
-//   return os;
-// }
-
-// template <Arithmetic T>
-// Vector<T>::Vector(T x, T y, T z) : _x{x}, _y{y}, _z{z} {}
-
-// template <Arithmetic T>
-// inline auto Vector<T>::operator==(const Vector<T> &v) const -> bool {
-//   return _x == v._x && _y == v._y && _z == v._z;
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::operator+(const Vector<T> &v) const -> Vector<T> {
-//   return Vector<T>(_x + v._x, _y + v._y, _z + v._z);
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::operator-(const Vector<T> &v) const -> Vector<T> {
-//   return Vector<T>(_x - v._x, _y - v._y, _z - v._z);
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::operator*(T s) const -> Vector<T> {
-//   return Vector<T>(_x * s, _y * s, _z * s);
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::operator/(T s) const -> Vector<T> {
-//   return Vector<T>(_x / s, _y / s, _z / s);
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::x() const -> T {
-//   return _x;
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::y() const -> T {
-//   return _y;
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::z() const -> T {
-//   return _z;
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::normL2() const -> T {
-//   return std::sqrt(_x * _x + _y * _y + _z * _z);
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::dot(const Vector<T> &v) const -> T {
-//   return _x * v._x + _y * v._y + _z * v._z;
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::cross(const Vector<T> &v) const -> Vector<T> {
-//   return Vector<T>(_y * v._z - _z * v._y, _z * v._x - _x * v._z,
-//                    _x * v._y - _y * v._x);
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::orthogonal(const Vector<T> &v) const -> bool {
-//   auto res = dot(v);
-//   return std::abs(res) < ZERO_TOLERANCE;
-// }
-
-// template <Arithmetic T>
-// inline auto Vector<T>::parallel(const Vector<T> &v) const -> bool {
-//   auto &&n = cross(v);
-//   return n.normL2() < ZERO_TOLERANCE;
-// }
-
-template <typename Vector, typename T>
+template <typename Vector = xfdtd::Vector, typename T = xfdtd::Real>
 class Plane {
  public:
   struct PlaneEquation {
@@ -179,7 +49,7 @@ inline auto Plane<Vector, T>::calculateEquation(
   auto &&v = p1 - p0;
   auto &&u = p2 - p0;
   auto tem = v - u;
-  auto l = tem.normL2();
+  // auto l = tem.normL2();
   auto &&n = v.cross(u);
   n = n / n.normL2();
 

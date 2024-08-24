@@ -19,8 +19,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 find_package(xfdtd_core REQUIRED)
-find_package(xtensor REQUIRED)
 
-message(STATUS ${xtensor_INCLUDE_DIRS})
+set(ASE_READER_PUBLIC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/external/ase_reader/include)
+set(XFDTD_MODEL_PUBLIC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${ASE_READER_PUBLIC_INCLUDE_DIRS})
 
-add_subdirectory(src)
+add_library(xfdtd_model INTERFACE)
+target_link_libraries(xfdtd_model INTERFACE xfdtd::xfdtd_core)
+target_include_directories(xfdtd_model INTERFACE 
+  $<BUILD_INTERFACE:${XFDTD_MODEL_PUBLIC_INCLUDE_DIRS}>
+  $<INSTALL_INTERFACE:include>)
+
+add_subdirectory(test)
+
+set(XFDTD_MODEL_CMAKE_DIR ${CMAKE_CURRENT_BINARY_DIR}/cmake)
+install(TARGETS xfdtd_model EXPORT xfdtd_model-targets)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/xfdtd_model-config.cmake.in
+  ${XFDTD_MODEL_CMAKE_DIR}/xfdtd_model-config.cmake
+  INSTALL_DESTINATION ${XFDTD_MODEL_CMAKE_DIR}
+)
+
+export(EXPORT xfdtd_model-targets
+  FILE ${XFDTD_MODEL_CMAKE_DIR}/xfdtd_model-targets.cmake
+  NAMESPACE xfdtd::
+)
