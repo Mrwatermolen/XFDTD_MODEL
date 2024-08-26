@@ -27,7 +27,8 @@ class ModeShapeBase : public Shape {
 
   virtual auto buildModel(Array1D<Real> x_node_positions,
                           Array1D<Real> y_node_positions,
-                          Array1D<Real> z_node_positions) -> void = 0;
+                          Array1D<Real> z_node_positions,
+                          Real factor) -> void = 0;
 
   auto& gridModel() const { return _grid_model; }
 
@@ -77,19 +78,49 @@ class ModelShape : public ModeShapeBase {
 
   auto buildModel(Array1D<Real> x_node_positions,
                   Array1D<Real> y_node_positions,
-                  Array1D<Real> z_node_positions) -> void override {
-    for (auto&& x : x_node_positions) {
-      x = standardToUnit(x);
+                  Array1D<Real> z_node_positions,
+                  Real factor) -> void override {
+    if (factor == 1.0) {
+      for (auto&& x : x_node_positions) {
+        x = standardToUnit(x);
+      }
+      for (auto&& y : y_node_positions) {
+        y = standardToUnit(y);
+      }
+      for (auto&& z : z_node_positions) {
+        z = standardToUnit(z);
+      }
+      _grid_model->buildModel(std::move(x_node_positions),
+                              std::move(y_node_positions),
+                              std::move(z_node_positions));
+      return;
     }
-    for (auto&& y : y_node_positions) {
-      y = standardToUnit(y);
-    }
-    for (auto&& z : z_node_positions) {
-      z = standardToUnit(z);
-    }
-    _grid_model->buildModel(std::move(x_node_positions),
-                            std::move(y_node_positions),
-                            std::move(z_node_positions));
+
+    auto x_min = standardToUnit(x_node_positions[0]);
+    auto x_max = standardToUnit(x_node_positions[x_node_positions.size() - 1]);
+    auto y_min = standardToUnit(y_node_positions[0]);
+    auto y_max = standardToUnit(y_node_positions[y_node_positions.size() - 1]);
+    auto z_min = standardToUnit(z_node_positions[0]);
+    auto z_max = standardToUnit(z_node_positions[z_node_positions.size() - 1]);
+    auto dx = (x_max - x_min) / (x_node_positions.size() - 1);
+    auto dy = (y_max - y_min) / (y_node_positions.size() - 1);
+    auto dz = (z_max - z_min) / (z_node_positions.size() - 1);
+    dx /= factor;
+    dy /= factor;
+    dz /= factor;
+    Array1D<Real> new_x_node_positions = xt::arange(x_min, x_max + dx, dx);
+    Array1D<Real> new_y_node_positions = xt::arange(y_min, y_max + dy, dy);
+    Array1D<Real> new_z_node_positions = xt::arange(z_min, z_max + dz, dz);
+    std::cout << "WARNING: ModeShape::buildModel: Use factor = " << factor
+              << " to scale the resolution of the model. It will build a new "
+                 "model with the uniform grid. The new resolution is dx = "
+              << dx << ", dy = " << dy << ", dz = " << dz
+              << ". The size of region is " << new_x_node_positions.size()
+              << " x " << new_y_node_positions.size() << " x "
+              << new_z_node_positions.size() << ".\n";
+    _grid_model->buildModel(std::move(new_x_node_positions),
+                            std::move(new_y_node_positions),
+                            std::move(new_z_node_positions));
   }
 
   static constexpr auto unitToStandard(xfdtd::Real value) -> xfdtd::Real {

@@ -18,8 +18,9 @@ class XFDTDModelModelObjectException : public XFDTDModelException {
 class ModelObject : public Object {
  public:
   ModelObject(std::string_view name, std::unique_ptr<ModeShapeBase> shape,
-              const std::shared_ptr<Material>& material)
+              const std::shared_ptr<Material>& material, Real factor = 1.0)
       : Object{name.data(), std::move(shape), material},
+        _factor{factor},
         _model_shape{dynamic_cast<ModeShapeBase*>(shapePtr())} {
     if (_model_shape == nullptr) {
       throw XFDTDModelModelObjectException{
@@ -43,13 +44,23 @@ class ModelObject : public Object {
             std::shared_ptr<EMF> emf) -> void override {
     Object::init(grid_space, calculation_param, emf);
     _model_shape->buildModel(grid_space->eNodeX(), grid_space->eNodeY(),
-                             grid_space->eNodeZ());
+                             grid_space->eNodeZ(), _factor);
   }
 
   auto& modelShape() const { return *_model_shape; }
 
+  /**
+   * @brief The factor for scaling the resolution of the model
+   * 
+   * @return Real
+   */
+  auto factor() const { return _factor; }
+
+  auto setFactor(Real factor) { _factor = factor; }
+
  private:
   ModeShapeBase* _model_shape{};
+  Real _factor{1.0}; // For scaling the resolution of the model
 };
 
 }  // namespace xfdtd::model

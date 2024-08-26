@@ -49,6 +49,16 @@ class GridModel {
 
     _node_record = buildNodeRecord(_triangular_model_info, _x_node_positions,
                                    _y_node_positions, _z_node_positions);
+
+    _x_center_positions = (xt::view(_x_node_positions, xt::range(_, -1)) +
+                           xt::view(_x_node_positions, xt::range(1, _))) *
+                          0.5;
+    _y_center_positions = (xt::view(_y_node_positions, xt::range(_, -1)) +
+                           xt::view(_y_node_positions, xt::range(1, _))) *
+                          0.5;
+    _z_center_positions = (xt::view(_z_node_positions, xt::range(_, -1)) +
+                           xt::view(_z_node_positions, xt::range(1, _))) *
+                          0.5;
   }
 
   auto writeToMsh(std::ostream& msh) -> void {
@@ -72,9 +82,9 @@ class GridModel {
       return false;
     }
 
-    auto i = xt::argmin(xt::abs(_x_node_positions - x)).front();
-    auto j = xt::argmin(xt::abs(_y_node_positions - y)).front();
-    auto k = xt::argmin(xt::abs(_z_node_positions - z)).front();
+    auto i = xt::argmin(xt::abs(_x_center_positions - x)).front();
+    auto j = xt::argmin(xt::abs(_y_center_positions - y)).front();
+    auto k = xt::argmin(xt::abs(_z_center_positions - z)).front();
     return isObjectGrid(_node_record, i, j, k);
   }
 
@@ -83,6 +93,7 @@ class GridModel {
   Array3D<int> _node_record;
 
   Array1D<Real> _x_node_positions, _y_node_positions, _z_node_positions;
+  Array1D<Real> _x_center_positions, _y_center_positions, _z_center_positions;
 
   static auto buildNodeRecord(const TriangularModelInfo& triangular_model_info,
                               const Array1D<Real>& x_node_positions,
