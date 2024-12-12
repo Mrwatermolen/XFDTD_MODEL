@@ -8,9 +8,6 @@ add_executable(fdtd_model_msh fdtd_model_msh.cpp)
 target_include_directories(fdtd_model_msh PUBLIC ${XFDTD_MODEL_PUBLIC_INCLUDE_DIRS})
 target_include_directories(fdtd_model_msh PRIVATE ${XFDTD_MODEL_PRIVATE_INCLUDE_DIRS})
 target_link_libraries(fdtd_model_msh xfdtd::xfdtd_core)
-target_compile_options(fdtd_model_msh PRIVATE -Wall -Wextra -Wpedantic)
-
-
 
 add_executable(model_scatter model_scatter.cpp)
 target_link_libraries(model_scatter PRIVATE xfdtd::xfdtd_core)

@@ -17,7 +17,7 @@ namespace xfdtd::model {
 
 class GridModel {
  public:
-  using IntersectionRecord = Array2D<std::multiset<xfdtd::Index>>;
+  using IntersectionRecord = Array2D<std::set<xfdtd::Index>>;
 
   auto& triangularModelInfo() const { return _triangular_model_info; }
 
